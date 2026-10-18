@@ -1,9 +1,13 @@
-ADR-001: Region and environments
+## ADR-001: Region and environment
 
-Here is what we’ll decide. Write it up in your own words.
+**Here is what we’ll decide.** 
 
-Region: us-east-1. Bedrock model availability is broad there, and CloudFront certificates must live in us-east-1 anyway.
-Account: one AWS account for the whole class.
-Environments: one EKS cluster, with staging and prod as namespaces.
-Terraform state: remote, in S3.
-Consequences to record: real companies use separate accounts per environment for blast-radius isolation, and we accept one account to keep cost and setup small. Say that plainly in the file.
+**Region:** us-east-1. Bedrock model availability is broad there, and CloudFront certificates must live in us-east-1 anyway.
+
+**Account:** one AWS account for the whole class.
+
+**Environments:** one EKS cluster, with staging and prod as namespaces.
+
+**Terraform state:** remote, in S3.
+
+*Consequences to record:* real companies use separate accounts per environment for blast-radius isolation, and we accept one account to keep cost and setup small.
