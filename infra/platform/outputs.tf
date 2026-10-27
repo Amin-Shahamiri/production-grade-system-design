@@ -17,3 +17,7 @@ output "database_subnet_group_name" {
 output "node_security_group_id" {
   value = module.eks.node_security_group_id
 }
+
+output "database_subnet_ids" {
+  value = module.vpc.database_subnets
+}

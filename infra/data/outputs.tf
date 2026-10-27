@@ -37,3 +37,7 @@ output "db_name" {
 output "db_secret_arn" {
   value = aws_db_instance.main.master_user_secret[0].secret_arn
 }
+
+output "redis_host" {
+  value = aws_elasticache_replication_group.redis.primary_endpoint_address
+}
