@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "worker" {
 
   statement {
     sid       = "WriteResults"
-    actions   = ["dynamodb:PutItem", "dynamodb:UploadItem"]
+    actions   = ["dynamodb:PutItem", "dynamodb:UpdateItem"]
     resources = [aws_dynamodb_table.results.arn]
   }
 }
