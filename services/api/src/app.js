@@ -57,7 +57,15 @@ export function createApp({ storage, queue, db }) {
   app.use((err, req, res, next) => {
     const status = err.status ?? err.statusCode ?? 500;
     if (status >= 500) {
-      console.error(JSON.stringify({ level: 'error', msg: err.message }));
+      console.error(
+        JSON.stringify({
+          level: 'error',
+          msg: err.message || err.name,
+          name: err.name,
+          code: err.code ?? err.errors?.[0]?.code,
+          stack: err.stack,
+        })
+      );
     }
     res.status(status).json({ error: status >= 500 ? 'internal error' : err.message });
   });

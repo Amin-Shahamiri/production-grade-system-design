@@ -116,3 +116,21 @@ test('if queueing fails, the document is marked enqueue_failed and the client ge
     assert.equal(deps.calls.statuses[0].status, 'enqueue_failed');
   });
 });
+
+test('unexpected errors return a generic 500 and never leak details', async () => {
+  const deps = makeDeps({
+    db: {
+      insertDocument: async () => {
+        throw new Error('password=hunter2 in connection string');
+      },
+      updateStatus: async () => {},
+    },
+  });
+  await withServer(deps, async (base) => {
+    const res = await post(base, 'hello', { 'x-user-id': 'user-1' });
+    assert.equal(res.status, 500);
+    const text = await res.text();
+    assert.ok(!text.includes('hunter2'));
+    assert.deepEqual(JSON.parse(text), { error: 'internal error' });
+  });
+});

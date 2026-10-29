@@ -5,15 +5,20 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "start": "node index.js",
+    "dev": "node --env-file=../../dev/api.local.env index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1160.0",
+    "@aws-sdk/client-sqs": "^3.1160.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
   }
 }
