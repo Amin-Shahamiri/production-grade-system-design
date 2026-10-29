@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "job-message.v1",
+  "title": "Job message v1",
+  "type": "object",
+  "required": ["schemaVersion", "jobId", "documentId", "userId", "s3Key", "requestedAt"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "jobId": { "type": "string", "format": "uuid" },
+    "documentId": { "type": "string", "format": "uuid" },
+    "userId": { "type": "string", "minLength": 1 },
+    "s3Key": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "requestedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}
