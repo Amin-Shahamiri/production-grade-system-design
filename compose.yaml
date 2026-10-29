@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: pgsd
+      POSTGRES_PASSWORD: localdev
+      POSTGRES_DB: docsummarizer
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./dev/init-db.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pgsd -d docsummarizer"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  aws:
+    image: hectorvent/floci:latest
+    ports:
+      - "4566:4566"
+
+  aws-init:
+    image: amazon/aws-cli
+    depends_on:
+      - aws
+    environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://aws:4566
+    volumes:
+      - ./dev/init-aws.sh:/init-aws.sh:ro
+    entrypoint: ["sh", "/init-aws.sh"]
+    restart: "no"
+
+volumes:
+  pgdata:
