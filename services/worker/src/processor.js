@@ -2,9 +2,9 @@ import { parseJobMessage } from './contract.js';
 
 export function createProcessor({ storage, model, results, log = () => {} }) {
   return async function processMessage(body) {
-    const { jobId, s3Key } = parseJobMessage(body);
+    const { jobId, s3Key, userId, documentId } = parseJobMessage(body);
 
-    const claim = await results.claim(jobId);
+    const claim = await results.claim(jobId, { userId, documentId });
     if (claim.state === 'already_done') {
       log({ level: 'info', msg: 'duplicate delivery, job already done', jobId });
       return 'ack';

@@ -19,7 +19,7 @@ function validBody(overrides = {}) {
 }
 
 function makeDeps({ claimState = 'claimed', model = createFakeModel() } = {}) {
-  const calls = { reads: [], completed: [], failed: [], summarized: 0 };
+  const calls = { reads: [], completed: [], failed: [], claims: [], summarized: 0 };
   return {
     calls,
     storage: {
@@ -35,7 +35,10 @@ function makeDeps({ claimState = 'claimed', model = createFakeModel() } = {}) {
       },
     },
     results: {
-      claim: async () => ({ state: claimState }),
+      claim: async (jobId, meta) => {
+        calls.claims.push({ jobId, meta });
+        return { state: claimState };
+      },
       complete: async (jobId, output) => {
         calls.completed.push({ jobId, output });
       },
@@ -55,6 +58,7 @@ test('processes a valid job: reads, summarizes, stores the result, acks', async 
   assert.equal(deps.calls.completed.length, 1);
   assert.equal(deps.calls.completed[0].jobId, JOB_ID);
   assert.match(deps.calls.completed[0].output.summary, /FAKE SUMMARY/);
+  assert.deepEqual(deps.calls.claims[0].meta, { userId: 'user-1', documentId: DOC_ID });
 });
 
 test('rejects a body that is not JSON, without touching the model', async () => {

@@ -14,7 +14,7 @@ export function createResults({ tableName }) {
   const key = (jobId) => ({ jobId: { S: jobId } });
 
   return {
-    async claim(jobId) {
+    async claim(jobId, { userId, documentId }) {
       const now = Date.now();
       try {
         await client.send(
@@ -22,6 +22,8 @@ export function createResults({ tableName }) {
             TableName: tableName,
             Item: {
               ...key(jobId),
+              userId: { S: userId },
+              documentId: { S: documentId },
               status: { S: 'processing' },
               startedAt: { N: String(now) },
               expiresAt: { N: String(Math.floor(now / 1000) + TTL_SECONDS) },
