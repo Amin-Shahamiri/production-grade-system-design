@@ -57,7 +57,7 @@ const getResult = (base, jobId, userId) =>
 test('GET /health returns ok', async () => {
   await withServer(makeDeps(), async (base) => {
     const res = await fetch(`${base}/health`);
-    assert.equal(res.status, 201);
+    assert.equal(res.status, 200);
   });
 });
 
