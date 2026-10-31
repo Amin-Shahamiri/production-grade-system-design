@@ -5,10 +5,18 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "start": "node index.js",
+    "dev": "node --env-file=../../dev/results.local.env index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1161.0",
+    "@aws-sdk/util-dynamodb": "^3.996.9",
+    "express": "^5.3.0",
+    "redis": "^6.3.1"
+  }
 }
