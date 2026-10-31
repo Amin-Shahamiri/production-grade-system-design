@@ -5,13 +5,20 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "start": "node index.js",
+    "dev": "node --env-file=../../dev/worker.local.env index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1160.0",
+    "@aws-sdk/client-dynamodb": "^3.1160.0",
+    "@aws-sdk/client-s3": "^3.1160.0",
+    "@aws-sdk/client-sqs": "^3.1160.0",
+    "@aws-sdk/util-dynamodb": "^3.996.9",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1"
   }
