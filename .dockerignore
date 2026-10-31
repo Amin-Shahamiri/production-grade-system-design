@@ -1,0 +1,11 @@
+**/node_modules
+**/*.test.js
+.git
+.github
+infra
+dev
+docs
+chart
+deploy
+compose.yaml
+*.md

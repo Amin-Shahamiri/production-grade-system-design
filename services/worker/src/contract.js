@@ -2,9 +2,10 @@ import { readFileSync } from 'node:fs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
-const schema = JSON.parse(
-  readFileSync(new URL('../../../contracts/job-message.v1.json', import.meta.url))
-);
+const contractPath =
+  process.env.CONTRACT_PATH ?? new URL('../../../contracts/job-message.v1.json', import.meta.url);
+const schema = JSON.parse(readFileSync(contractPath));
+
 const ajv = new Ajv2020();
 addFormats(ajv);
 const validate = ajv.compile(schema);

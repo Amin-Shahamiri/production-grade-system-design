@@ -20,7 +20,8 @@ export function createConsumer({
         level: 'error',
         msg: 'message failed, leaving it for redelivery',
         messageId: message.id,
-        error: err.message,
+        error: err.message || err.name,
+        code: err.code ?? err.errors?.[0]?.code,
       });
     }
   }
@@ -37,7 +38,12 @@ export function createConsumer({
         });
       } catch (err) {
         if (!running) break;
-        log({ level: 'error', msg: 'receive failed', error: err.message });
+        log({
+          level: 'error',
+          msg: 'receive failed',
+          error: err.message || err.name,
+          code: err.code ?? err.errors?.[0]?.code,
+        });
         await sleep(2000);
         continue;
       }
