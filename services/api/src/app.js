@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 const MAX_BYTES = 100 * 1024;
 const SAFE_USER_ID = /^[A-Za-z0-9_-]{1,64}$/;
 
-export function createApp({ storage, queue, db }) {
+export function createApp({ storage, queue, db, limiter = { hit: async () => ({ allowed: true }) } }) {
   const app = express();
   app.disable('x-powered-by');
 
@@ -12,17 +12,44 @@ export function createApp({ storage, queue, db }) {
     res.json({ status: 'ok' });
   });
 
+  function identify(req, res, next) {
+    const userId = req.get('x-user-id');
+    if (!userId) {
+      return res.status(401).json({ error: 'missing x-user-id' });
+    }
+    if (!SAFE_USER_ID.test(userId)) {
+      return res.status(400).json({ error: 'invalid user id' });
+    }
+    req.userId = userId;
+    next();
+  }
+
+  async function rateLimit(req, res, next) {
+    try {
+      const result = await limiter.hit(req.userId);
+      if (!result.allowed) {
+        res.set('retry-after', String(result.retryAfter));
+        return res.status(429).json({ error: 'too many requests' });
+      }
+    } catch (err) {
+      console.error(
+        JSON.stringify({
+          level: 'warn',
+          msg: 'rate limiter unavailable, allowing request',
+          error: err.message || err.name,
+        })
+      );
+    }
+    next();
+  }
+
   app.post(
     '/documents',
+    identify,
+    rateLimit,
     express.text({ type: 'text/plain', limit: MAX_BYTES }),
     async (req, res) => {
-      const userId = req.get('x-user-id');
-      if (!userId) {
-        return res.status(401).json({ error: 'missing x-user-id' });
-      }
-      if (!SAFE_USER_ID.test(userId)) {
-        return res.status(400).json({ error: 'invalid user id' });
-      }
+      const userId = req.userId;
       if (typeof req.body !== 'string' || req.body.trim() === '') {
         return res.status(400).json({ error: 'body must be non-empty text/plain' });
       }

@@ -134,3 +134,46 @@ test('unexpected errors return a generic 500 and never leak details', async () =
     assert.deepEqual(JSON.parse(text), { error: 'internal error' });
   });
 });
+
+test('over the limit: 429 with Retry-After, and nothing is stored or queued', async () => {
+  const deps = makeDeps({
+    limiter: { hit: async () => ({ allowed: false, retryAfter: 30 }) },
+  });
+  await withServer(deps, async (base) => {
+    const res = await post(base, 'hello', { 'x-user-id': 'user-1' });
+    assert.equal(res.status, 429);
+    assert.equal(res.headers.get('retry-after'), '30');
+    assert.equal(deps.calls.puts.length, 0);
+    assert.equal(deps.calls.sent.length, 0);
+  });
+});
+
+test('the limiter is keyed by the user id', async () => {
+  const seen = [];
+  const deps = makeDeps({
+    limiter: {
+      hit: async (userId) => {
+        seen.push(userId);
+        return { allowed: true };
+      },
+    },
+  });
+  await withServer(deps, async (base) => {
+    await post(base, 'hello', { 'x-user-id': 'user-7' });
+    assert.deepEqual(seen, ['user-7']);
+  });
+});
+
+test('if the limiter fails, the request is still served (fail open)', async () => {
+  const deps = makeDeps({
+    limiter: {
+      hit: async () => {
+        throw new Error('redis down');
+      },
+    },
+  });
+  await withServer(deps, async (base) => {
+    const res = await post(base, 'hello', { 'x-user-id': 'user-1' });
+    assert.equal(res.status, 202);
+  });
+});
