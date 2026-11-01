@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     groups:
       actions:
         patterns: ["*"]
@@ -14,7 +14,7 @@ updates:
       - /services/worker
       - /services/results
     schedule:
-      interval: weekly
+      interval: monthly
     groups:
       npm-minor-and-patch:
         update-types: [minor, patch]
@@ -25,7 +25,10 @@ updates:
       - /services/worker
       - /services/results
     schedule:
-      interval: weekly
+      interval: monthly
+    ignore:
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: terraform
     directories:
@@ -34,4 +37,4 @@ updates:
       - /infra/data
       - /infra/ci
     schedule:
-      interval: weekly
+      interval: monthly
