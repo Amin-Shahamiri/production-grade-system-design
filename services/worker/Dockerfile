@@ -7,6 +7,7 @@ FROM node:24-slim
 ENV NODE_ENV=production
 ENV CONTRACT_PATH=/app/contracts/job-message.v1.json
 WORKDIR /app
+RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 COPY --from=deps /app/node_modules ./node_modules
 COPY services/worker/package.json ./
 COPY services/worker/index.js ./
