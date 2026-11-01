@@ -1,9 +1,9 @@
-FROM node:24-slim AS deps
+FROM node:26-slim AS deps
 WORKDIR /app
 COPY services/worker/package.json services/worker/package-lock.json ./
 RUN npm ci --omit=dev
 
-FROM node:24-slim
+FROM node:26-slim
 ENV NODE_ENV=production
 ENV CONTRACT_PATH=/app/contracts/job-message.v1.json
 WORKDIR /app
