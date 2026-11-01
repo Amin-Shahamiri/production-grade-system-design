@@ -27,9 +27,48 @@ jobs:
           cache-dependency-path: services/${{ matrix.service }}/package-lock.json
       - run: npm ci
       - run: npm test
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Scan the full Git history for secrets
+        run: |
+          docker run --rm -v "$PWD:/repo" \
+            ghcr.io/gitleaks/gitleaks@sha256:sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            detect --source /repo --redact --verbose
+
+  scan-images:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [api, worker, results]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: services/${{ matrix.service }}/Dockerfile
+          load: true
+          provenance: false
+          tags: pgsd-${{ matrix.service }}:scan
+          cache-from: type=gha,scope=${{ matrix.service }}
+      - name: Save the image to a file
+        run: docker save pgsd-${{ matrix.service }}:scan -o image.tar
+      - name: Scan the image for known vulnerabilities
+        run: |
+          docker run --rm -v "$PWD:/work" \
+            ghcr.io/aquasecurity/trivy@sha256:sha256:3d1f862cb6c4fe13c1506f96f816096030d8d5ccdb2380a3069f7bf07daa86aa \
+            image --input /work/image.tar \
+            --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1
   
   build:
-    needs: test
+    needs: [test, secrets, scan-images]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
