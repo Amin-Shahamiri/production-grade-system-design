@@ -8,6 +8,20 @@ variable "create_oidc_provider" {
   default = true
 }
 
+variable "github_owner_id" {
+  type = number
+}
+
+variable "github_repo_id" {
+  type = number
+}
+
+locals {
+  github_owner      = split("/", var.github_repo)[0]
+  github_name       = split("/", var.github_repo)[1]
+  github_sub_prefix = "repo:${local.github_owner}@${var.github_owner_id}/${local.github_name}@${var.github_repo_id}"
+}
+
 locals {
   services = ["api", "worker", "results"]
 }
@@ -89,7 +103,7 @@ data "aws_iam_policy_document" "github_trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:refs/heads/main"]
+      values   = ["${local.github_sub_prefix}:ref:refs/heads/main"]
     }
   }
 }
@@ -111,6 +125,7 @@ data "aws_iam_policy_document" "github_ci" {
     sid = "EcrPush"
     actions = [
       "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
       "ecr:InitiateLayerUpload",
       "ecr:UploadLayerPart",
       "ecr:CompleteLayerUpload",
