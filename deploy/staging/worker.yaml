@@ -1,0 +1,15 @@
+name: worker
+image:
+  repository: 665768711116.dkr.ecr.us-east-1.amazonaws.com/pgsd/worker
+  tag: 2ee3b05228874688f272e7e9002f65053e5c9cd2
+terminationGracePeriodSeconds: 90
+env:
+  AWS_REGION: us-east-1
+  S3_BUCKET: pgsd-uploads-665768711116
+  QUEUE_URL: https://sqs.us-east-1.amazonaws.com/665768711116/pgsd-jobs
+  RESULTS_TABLE: pgsd-job-results
+  MODEL_PROVIDER: fake
+  FAKE_MODEL_DELAY_MS: "2000"
+  WORKER_CONCURRENCY: "2"
+  # When MODEL_PROVIDER is bedrock, this must match bedrock_profile_id in infra/data/variables.tf
+  BEDROCK_MODEL_ID: us.anthropic.claude-haiku-4-5-20251001-v1:0
