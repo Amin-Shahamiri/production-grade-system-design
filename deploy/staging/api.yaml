@@ -1,0 +1,24 @@
+name: api
+image:
+  repository: "665768711116.dkr.ecr.us-east-1.amazonaws.com/pgsd/api"
+  tag: "f0b49f9c5dec5d92a1ce16987669c16c478c6e4e"
+service:
+  enabled: true
+probes:
+  enabled: true
+env:
+  AWS_REGION: us-east-1
+  S3_BUCKET: pgsd-uploads-665768711116
+  QUEUE_URL: https://sqs.us-east-1.amazonaws.com/665768711116/pgsd-jobs
+  DB_HOST: pgsd-postgres.c2rg04k8ifqd.us-east-1.rds.amazonaws.com
+  DB_PORT: 5432
+  DB_NAME: docsummarizer
+  REDIS_URL: rediss://master.pgsd-redis.nt3ohm.use1.cache.amazonaws.com:6379
+  RATE_LIMIT_PER_MINUTE: "10"
+secretEnv:
+  - name: DB_USER
+    secretName: db-credentials
+    key: username
+  - name: DB_PASSWORD
+    secretName: db-credentials
+    key: password

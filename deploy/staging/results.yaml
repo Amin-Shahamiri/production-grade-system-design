@@ -1,0 +1,12 @@
+name: results
+image:
+  repository: 665768711116.dkr.ecr.us-east-1.amazonaws.com/pgsd/results
+  tag: f10c89cb739c24af9c110c093bd6717b8f9a0611
+service:
+  enabled: true
+probes:
+  enabled: true
+env:
+  AWS_REGION: us-east-1
+  RESULTS_TABLE: pgsd-job-results
+  REDIS_URL: rediss://master.pgsd-redis.nt3ohm.use1.cache.amazonaws.com:6379

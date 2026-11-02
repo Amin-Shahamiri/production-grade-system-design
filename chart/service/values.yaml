@@ -1,0 +1,30 @@
+# The service name: api, worker or results.
+# It is also the Kubernetes service account name, and it must match the Pod Identity association in Terraform.
+name: ""
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+replicas: 1
+port: 8080
+
+service:
+  enabled: false
+
+probes:
+  enabled: false
+
+env: {}
+
+secretEnv: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 384Mi
+
+terminationGracePeriodSeconds: 30
