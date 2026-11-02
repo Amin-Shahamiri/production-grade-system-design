@@ -41,3 +41,7 @@ output "db_secret_arn" {
 output "redis_host" {
   value = aws_elasticache_replication_group.redis.primary_endpoint_address
 }
+
+output "bedrock_profile_id" {
+  value = var.bedrock_profile_id
+}
