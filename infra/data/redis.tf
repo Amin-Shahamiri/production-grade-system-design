@@ -2,10 +2,6 @@ locals {
   db_subnet_ids = data.terraform_remote_state.platform.outputs.database_subnet_ids
 }
 
-variable "redis_node_type" {
-  type    = string
-  default = "cache.t3.micro"
-}
 
 resource "aws_elasticache_subnet_group" "redis" {
   name       = "pgsd-redis"

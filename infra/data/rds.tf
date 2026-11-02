@@ -13,11 +13,6 @@ locals {
   node_sg_id      = data.terraform_remote_state.platform.outputs.node_security_group_id
 }
 
-variable "db_instance_class" {
-  type    = string
-  default = "db.t3.micro"
-}
-
 resource "aws_security_group" "rds" {
   name        = "pgsd-rds"
   description = "PostgreSQL access from EKS nodes only"

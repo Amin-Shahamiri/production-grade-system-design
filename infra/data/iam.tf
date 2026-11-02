@@ -51,6 +51,24 @@ data "aws_iam_policy_document" "worker" {
     actions   = ["dynamodb:PutItem", "dynamodb:UpdateItem"]
     resources = [aws_dynamodb_table.results.arn]
   }
+
+  statement {
+    sid       = "BedrockProfile"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:aws:bedrock:us-east-1:${data.aws_caller_identity.current.account_id}:inference-profile/${var.bedrock_profile_id}"]
+  }
+
+  statement {
+    sid       = "BedrockModelThroughProfileOnly"
+    actions   = ["bedrock:InvokeModel"]
+    resources = [for r in var.bedrock_regions : "arn:aws:bedrock:${r}::foundation-model/${var.bedrock_model_id}"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "bedrock:InferenceProfileArn"
+      values   = ["arn:aws:bedrock:us-east-1:${data.aws_caller_identity.current.account_id}:inference-profile/${var.bedrock_profile_id}"]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "results" {
