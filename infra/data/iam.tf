@@ -117,3 +117,29 @@ resource "aws_eks_pod_identity_association" "service" {
   service_account = each.value.service
   role_arn        = aws_iam_role.service[each.value.service].arn
 }
+
+data "aws_iam_policy_document" "external_secrets" {
+  statement {
+    sid       = "ReadDbCredentials"
+    actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+    resources = [aws_secretsmanager_secret.db.arn]
+  }
+}
+
+resource "aws_iam_role" "external_secrets" {
+  name               = "pgsd-external-secrets"
+  assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
+}
+
+resource "aws_iam_role_policy" "external_secrets" {
+  name   = "pgsd-external-secrets-read"
+  role   = aws_iam_role.external_secrets.id
+  policy = data.aws_iam_policy_document.external_secrets.json
+}
+
+resource "aws_eks_pod_identity_association" "external_secrets" {
+  cluster_name    = local.cluster_name
+  namespace       = "external-secrets"
+  service_account = "external-secrets"
+  role_arn        = aws_iam_role.external_secrets.arn
+}
