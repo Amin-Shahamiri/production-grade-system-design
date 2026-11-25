@@ -34,14 +34,14 @@ output "db_name" {
   value = aws_db_instance.main.db_name
 }
 
-output "db_secret_arn" {
-  value = aws_db_instance.main.master_user_secret[0].secret_arn
-}
-
 output "redis_host" {
   value = aws_elasticache_replication_group.redis.primary_endpoint_address
 }
 
 output "bedrock_profile_id" {
   value = var.bedrock_profile_id
+}
+
+output "db_secret_arn" {
+  value = aws_secretsmanager_secret.db.arn
 }

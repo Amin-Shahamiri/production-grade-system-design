@@ -39,9 +39,10 @@ resource "aws_db_instance" "main" {
   storage_type      = "gp3"
   storage_encrypted = true
 
-  db_name                     = "docsummarizer"
-  username                    = "pgsd_admin"
-  manage_master_user_password = true
+  db_name  = "docsummarizer"
+  username = "pgsd_admin"
+  # manage_master_user_password = true
+  password = random_password.db.result
 
   db_subnet_group_name   = local.db_subnet_group
   vpc_security_group_ids = [aws_security_group.rds.id]
@@ -53,4 +54,22 @@ resource "aws_db_instance" "main" {
   skip_final_snapshot        = true  // Avoid for production
   auto_minor_version_upgrade = true
   apply_immediately          = true
+}
+
+resource "random_password" "db" {
+  length  = 32
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "db" {
+  name                    = "pgsd/db-credentials"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "db" {
+  secret_id = aws_secretsmanager_secret.db.id
+  secret_string = jsonencode({
+    username = aws_db_instance.main.username
+    password = random_password.db.result
+  })
 }
